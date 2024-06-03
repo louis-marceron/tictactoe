@@ -1,5 +1,10 @@
+variable "aws_region" {
+  description = "The AWS region to deploy resources in"
+  default     = "us-east-1"
+}
+
 provider "aws" {
-  region = "us-east-1"
+  region = var.aws_region
 }
 
 variable "backend_image" {
@@ -205,13 +210,32 @@ resource "aws_ecs_task_definition" "frontend" {
       {
         name  = "PUBLIC_BACKEND_URL"
         value = aws_lb.main.dns_name
+      },
+      {
+        name  = "PUBLIC_AWS_REGION"
+        value = var.aws_region
+      },
+      {
+        name  = "PUBLIC_AWS_USER_POOL_ID"
+        value = aws_cognito_user_pool.pool.id
+      },
+      {
+        name  = "PUBLIC_AWS_APP_CLIENT_ID"
+        value = aws_cognito_user_pool_client.client.id
       }
+
     ]
     portMappings = [{
       containerPort = 3000
       hostPort      = 3000
     }]
   }])
+
+  depends_on = [
+    aws_lb.main,
+    aws_cognito_user_pool.pool,
+    aws_cognito_user_pool_client.client
+  ]
 }
 
 resource "aws_ecs_service" "frontend" {
@@ -229,4 +253,41 @@ resource "aws_ecs_service" "frontend" {
   depends_on = [
     aws_ecs_service.backend
   ]
+}
+
+resource "aws_cognito_user_pool" "pool" {
+  name              = "tictactoe-pool"
+  mfa_configuration = "OFF"
+
+  auto_verified_attributes = ["email"]
+
+  verification_message_template {
+    email_message = "Your verification code is {####}"
+    email_subject = "Your verification code"
+    sms_message   = "Your verification code is {####}"
+  }
+}
+
+resource "aws_cognito_user_pool_client" "client" {
+  name         = "tictactoe-web-client"
+  user_pool_id = aws_cognito_user_pool.pool.id
+
+  explicit_auth_flows = [
+    "ALLOW_REFRESH_TOKEN_AUTH",
+    "ALLOW_USER_PASSWORD_AUTH",
+    "ALLOW_CUSTOM_AUTH",
+    "ALLOW_USER_SRP_AUTH"
+  ]
+}
+
+resource "aws_cognito_user" "default_user" {
+  user_pool_id = aws_cognito_user_pool.pool.id
+  username     = "default"
+
+  attributes = {
+    email = "default@example.com"
+  }
+
+  force_alias_creation = false
+  password             = "P@ssw0rd123!"
 }

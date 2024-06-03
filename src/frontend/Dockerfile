@@ -33,6 +33,9 @@ COPY --from=install /temp/prod/node_modules ./frontend/node_modules
 COPY --from=prerelease /usr/src/app/frontend/build ./frontend/build
 
 ENV PUBLIC_BACKEND_URL=localhost:8080
+ENV PUBLIC_AWS_REGION=us-east-1
+ENV PUBLIC_AWS_USER_POOL_ID=us-east-1_e1UsqQQol
+ENV PUBLIC_AWS_APP_CLIENT_ID=4nfv4sob48qh61hvoiulvolb1k
 
 WORKDIR /usr/src/app/frontend/build
 USER bun

@@ -13,6 +13,7 @@
 	} from '../../../../api';
 
 	import { onMount } from 'svelte';
+	import { retrieveUsername } from '$lib/retrieveUsername';
 
 	// We must use dynamic imports inside onMount to avoid SSR errors
 	onMount(async () => {
@@ -28,7 +29,6 @@
 	});
 
 	let socket: WebSocket;
-	let usernameInput: HTMLInputElement;
 	let username = '';
 	let backendUrl: string = '';
 
@@ -107,9 +107,29 @@
 		}
 	};
 
-	const handleJoinQueue = (event: Event) => {
+	const handleJoinQueue = async (event: Event) => {
 		event.preventDefault();
-		username = usernameInput.value.trim();
+
+		function getUsernameFromEmail(email: string): string {
+			const atIndex = email.indexOf('@');
+			if (atIndex === -1) {
+				throw new Error('Invalid email address');
+			}
+
+			return email.substring(0, atIndex).replace(/[-_]/g, '');
+		}
+
+		function truncateString(str: string, maxLength: number = 16): string {
+			if (str.length <= maxLength) {
+				return str;
+			}
+			return str.substring(0, maxLength);
+		}
+
+		const retrievedUsername = await retrieveUsername();
+		username = getUsernameFromEmail(retrievedUsername);
+		username = truncateString(username);
+
 		if (username) {
 			initializeSocket(username);
 		}
@@ -158,14 +178,11 @@
 	{/if}
 {:else}
 	<form>
-		<label for="username">Username:</label>
-		<input bind:this={usernameInput} type="text" id="username" name="username" required />
 		<button type="submit" on:click={handleJoinQueue}>Join queue</button>
 	</form>
 {/if}
 
 <style>
-	input,
 	button {
 		color: white;
 		border: 1px solid white;
