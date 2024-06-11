@@ -9,12 +9,12 @@ provider "aws" {
 
 variable "backend_image" {
   type    = string
-  default = "851725339291.dkr.ecr.us-east-1.amazonaws.com/myback:v1"
+  default = "851725339291.dkr.ecr.us-east-1.amazonaws.com/myback:v2"
 }
 
 variable "frontend_image" {
   type    = string
-  default = "851725339291.dkr.ecr.us-east-1.amazonaws.com/myfront:v1"
+  default = "851725339291.dkr.ecr.us-east-1.amazonaws.com/myfront:v2"
 }
 
 resource "aws_vpc" "main" {
