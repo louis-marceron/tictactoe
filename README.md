@@ -1,16 +1,37 @@
-## TODO
-- [x] Fix my terrible frontend docker file
-- [x] Only store the build files in the docker
-- [ ] Store the ws connection in a store to avoid creating a new connection 
-every time the component is created
-- [ ] In multiplayer mode, do the action in local and then send it to the server
-for less latency
-- [ ] Join a custom room by entering the room name or a link
-- [ ] Join a custom room with a QR code
-- [ ] Deploy the application on AWS
-- [ ] Send the least amount of data from the server
-- [ ] Notifications system
-- [ ] Send ID of to the player to deal with the case of two players with the 
-same name
-- [ ] Common folder for the server and the client for TicTacToe logic and API
-- [ ] Animations
+# Louis Marceron - Fargate, Cognito, TicTacToe report
+
+Course: Cloud programming
+Group: 3
+Date: 2024-06-11
+
+## Environment Architecture:
+
+### Compute
+
+- ECS Fargate services running the frontend and backend applications
+- Load Balancer to manage traffic between frontend and backend
+- Cognito user pool 
+
+### Authentication
+
+- AWS Cognito for user authentication and management
+
+### Software
+
+- Frontend application running in Bun with the framework Svelte
+- Backend application running in Bun
+- Both applications are containerized with Docker
+- Cognito integration for user login and nickname display when a game is started
+
+## Screenshots
+![image](https://github.com/pwr-cloudprogramming/a10-louis-marceron/assets/72874947/02aec3f7-abf2-415d-8ec2-8d0aee5d3385)
+
+## Reflections
+
+### What did you learn?
+
+- Had difficulty finding easily understandable documentation for the frontend cognito integration
+
+### What helped most in overcoming obstacles?
+
+- Using the AWS Cognito React tutorial as a guide and adapting the code for Svelte
